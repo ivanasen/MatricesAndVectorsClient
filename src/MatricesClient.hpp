@@ -2,19 +2,23 @@
 
 #include <vector>
 #include <string>
-#include <map>
-#include "Client.hpp"
+#include <unordered_map>
 #include <Matrix.hpp>
+
+
+#include "Client.hpp"
 
 class MatricesClient : public Client {
 private:
-	std::map<std::string, linalg::Matrix<double>> mVariables;
+	std::unordered_map<std::string, std::shared_ptr<linalg::Matrix<double>>> mVariables;
 public:
+	MatricesClient();
+
 	void onInput(const std::string &input) override;
 
-	void initMatrix();
+	void initMatrix(std::string string);
 
-	void printMatrix();
+	void printMatrix(const std::string &string);
 
 	void evaluateExpression(const std::string &string);
 
