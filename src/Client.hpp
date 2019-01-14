@@ -16,12 +16,12 @@ protected:
 
 	static std::string DEFAULT_QUIT_CMD();
 
+	virtual void onInput(const std::string &input) = 0;
+
 public:
 	Client();
 
 	Client(const std::string &commandPrefix, const std::string &quitCommand);
 
 	virtual void start();
-
-	virtual void onInput(const std::string &input) = 0;
 };

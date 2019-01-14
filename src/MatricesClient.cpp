@@ -1,6 +1,7 @@
 #include <iostream>
 #include <regex>
 #include <memory>
+#include <Vector.hpp>
 
 #include "MatricesClient.hpp"
 #include "Constants.hpp"
@@ -15,6 +16,8 @@ void MatricesClient::onInput(const std::string &input) {
 
 	if (std::regex_search(input, matches, Constants::MATRIX_INIT_REGEX)) {
 		initialiseMatrixFromInput(input);
+	} else if (std::regex_search(input, matches, Constants::VECTOR_INIT_REGEX)) {
+		initialiseVectorFromInput(input);
 	} else if (std::regex_search(input, matches, Constants::MATRIX_PRINT_REGEX)) {
 		printMatrix(input);
 	} else if (std::regex_search(input, matches, Constants::MATRIX_TRANSPOSE_REGEX)) {
@@ -35,31 +38,50 @@ void MatricesClient::onInput(const std::string &input) {
 }
 
 void MatricesClient::initialiseMatrixFromInput(std::string input) {
-	std::regex nameRegex("[a-zA-Z_$][a-zA-Z_$0-9]*");
-	std::regex dimensionRegex("[0-9]+");
 	std::smatch nameMatch;
 	std::smatch dimensionsMatch;
 
-	std::regex_search(input, nameMatch, nameRegex);
+	std::regex_search(input, nameMatch, Constants::MATRIX_NAME_REGEX);
 	std::string matrixName = nameMatch[0];
 
-	std::regex_search(input, dimensionsMatch, dimensionRegex);
+	std::regex_search(input, dimensionsMatch, Constants::MATRIX_DIMENSION_REGEX);
 	unsigned long matrixHeight = stoul(dimensionsMatch[0]);
 	input = dimensionsMatch.suffix();
-	std::regex_search(input, dimensionsMatch, dimensionRegex);
+	std::regex_search(input, dimensionsMatch, Constants::MATRIX_DIMENSION_REGEX);
 	unsigned long matrixWidth = stoul(dimensionsMatch[0]);
 
 	std::vector<std::vector<double>> matrixValues(matrixHeight, std::vector<double>(matrixWidth));
 	for (int i = 0; i < matrixHeight; i++) {
-		std::cout << "Enter row " + std::to_string(i + 1) + ": ";
+		std::cout << "Enter row " << i + 1 << ": ";
+
 		for (int j = 0; j < matrixWidth; j++) {
 			std::cin >> matrixValues[i][j];
 		}
 	}
 
-	auto matrix = std::make_shared<linalg::Matrix<double>>(matrixValues);
-
+	auto matrix = std::make_shared<linalg::Matrix<double>>
+			(matrixValues);
 	mVariables[matrixName] = matrix;
+}
+
+void MatricesClient::initialiseVectorFromInput(const std::string &input) {
+	std::smatch nameMatch;
+	std::smatch dimensionsMatch;
+
+	std::regex_search(input, nameMatch, Constants::MATRIX_NAME_REGEX);
+	std::string vectorName = nameMatch[0];
+
+	std::regex_search(input, dimensionsMatch, Constants::MATRIX_DIMENSION_REGEX);
+	unsigned long vectorSize = stoul(dimensionsMatch[0]);
+
+	std::vector<double> vectorValues(vectorSize);
+	std::cout << "Enter values: ";
+	for (int i = 0; i < vectorSize; i++) {
+		std::cin >> vectorValues[i];
+	}
+
+	auto vector = std::make_shared<linalg::Vector<double>>(vectorValues);
+	mVariables[vectorName] = vector;
 }
 
 void MatricesClient::printMatrix(const std::string &name) {
@@ -99,12 +121,17 @@ void MatricesClient::printTransposed(const std::string &input) {
 	std::cout << matrix.transpose();
 }
 
-void MatricesClient::printNormalisedVector(const std::string &string) {
-
+void MatricesClient::printNormalisedVector(const std::string &input) {
+	linalg::Matrix<double> vectorMatrix = getMatrixFromInput(input);
+	if (vectorMatrix.height() != 1) {
+		std::cerr << "Specified variable is not a Vector" << std::endl;
+	}
+	linalg::Vector<double> vector(vectorMatrix);
+	std::cout << vector.normalize();
 }
 
 void MatricesClient::printEvaluatedExpression(const std::string &string) {
-
+	std::cout << "Magic\n";
 }
 
 linalg::Matrix<double> MatricesClient::getMatrixFromInput(const std::string &input) {
@@ -124,5 +151,3 @@ linalg::Matrix<double> MatricesClient::getMatrixFromInput(const std::string &inp
 MatricesClient::MatricesClient() : Client() {
 	mVariables = std::unordered_map<std::string, std::shared_ptr<linalg::Matrix<double>>>();
 }
-
-
