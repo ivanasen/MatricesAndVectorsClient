@@ -11,26 +11,28 @@
 class MatricesClient : public Client {
 private:
 	std::unordered_map<std::string, std::shared_ptr<linalg::Matrix<double>>> mVariables;
+
+	linalg::Matrix<double> getMatrixFromInput(const std::string &input);
 public:
 	MatricesClient();
 
 	void onInput(const std::string &input) override;
 
-	void initMatrix(std::string string);
+	void initialiseMatrixFromInput(std::string input);
 
 	void printMatrix(const std::string &string);
 
-	void evaluateExpression(const std::string &string);
+	void printEvaluatedExpression(const std::string &string);
 
-	void printDeterminant();
+	void printDeterminant(const std::string &string);
 
-	void transposeMatrix();
+	void printTransposed(const std::string &input);
 
-	void printInverse();
+	void printInverse(const std::string &string);
 
-	void printDiagonalMatrix();
+	void printDiagonalMatrix(const std::string &string);
 
-	void printNormalisedVector();
+	void printNormalisedVector(const std::string &string);
 
 	static void init();
 };

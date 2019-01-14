@@ -3,24 +3,7 @@
 #include <memory>
 
 #include "MatricesClient.hpp"
-
-template<class T>
-T applyOperator(T a, T b, char op) {
-	switch (op) {
-		case '+':
-			return a + b;
-		case '-':
-			return a - b;
-		case '*':
-			return a * b;
-		default:
-			throw std::invalid_argument("Invalid operator.");
-	}
-}
-
-bool isLetter(char c) {
-	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-}
+#include "Constants.hpp"
 
 void MatricesClient::init() {
 	MatricesClient client;
@@ -28,40 +11,30 @@ void MatricesClient::init() {
 }
 
 void MatricesClient::onInput(const std::string &input) {
-	// Regex expressions for matching input commands
-	static std::regex matrixInit("^[ ]*[a-zA-Z_$][a-zA-Z_$0-9]*[ ]*\\[[ ]*[0-9]+[ ]*,[ ]*[0-9]+[ ]*\\]+[ ]*$");
-	static std::regex matrixPrint("^[ ]*[a-zA-Z_$][a-zA-Z_$0-9]*[ ]*$");
-	static std::regex matrixTranspose("^[ ]*[a-zA-Z_$][a-zA-Z_$0-9]*.T[ ]*$");
-	static std::regex matrixDeterminant("^[ ]*[a-zA-Z_$][a-zA-Z_$0-9]*.det[ ]*$");
-	static std::regex matrixInverse("^[ ]*[a-zA-Z_$][a-zA-Z_$0-9]*.inverse[ ]*$");
-	static std::regex matrixDiagonal("^[ ]*[a-zA-Z_$][a-zA-Z_$0-9]*.diagonal[ ]*$");
-	static std::regex vectorNormalise("^[ ]*[a-zA-Z_$][a-zA-Z_$0-9]*.normalise[ ]*$");
-	static std::regex expression(R"(^[ ]*(([a-zA-Z_$][a-zA-Z_$0-9]*|\d+(\.\d+)?)[ ]*([-+/*])*[ ]*)*$)");
-
 	std::smatch matches;
 
-	if (std::regex_search(input, matches, matrixInit)) {
-		initMatrix(input);
-	} else if (std::regex_search(input, matches, matrixPrint)) {
+	if (std::regex_search(input, matches, Constants::MATRIX_INIT_REGEX)) {
+		initialiseMatrixFromInput(input);
+	} else if (std::regex_search(input, matches, Constants::MATRIX_PRINT_REGEX)) {
 		printMatrix(input);
-	} else if (std::regex_search(input, matches, matrixTranspose)) {
-		transposeMatrix();
-	} else if (std::regex_search(input, matches, matrixDeterminant)) {
-		printDeterminant();
-	} else if (std::regex_search(input, matches, matrixInverse)) {
-		printInverse();
-	} else if (std::regex_search(input, matches, matrixDiagonal)) {
-		printDiagonalMatrix();
-	} else if (std::regex_search(input, matches, vectorNormalise)) {
-		printNormalisedVector();
-	} else if (std::regex_search(input, matches, expression)) {
-		evaluateExpression(input);
+	} else if (std::regex_search(input, matches, Constants::MATRIX_TRANSPOSE_REGEX)) {
+		printTransposed(input);
+	} else if (std::regex_search(input, matches, Constants::MATRIX_DETERMINANT_REGEX)) {
+		printDeterminant(input);
+	} else if (std::regex_search(input, matches, Constants::MATRIX_INVERSE_REGEX)) {
+		printInverse(input);
+	} else if (std::regex_search(input, matches, Constants::MATRIX_DIAGONAL_REGEX)) {
+		printDiagonalMatrix(input);
+	} else if (std::regex_search(input, matches, Constants::VECTOR_NORMALISE_REGEX)) {
+		printNormalisedVector(input);
+	} else if (std::regex_search(input, matches, Constants::EXPRESSION_REGEX)) {
+		printEvaluatedExpression(input);
 	} else {
 		std::cerr << "Unknown command " + input + "\n";
 	}
 }
 
-void MatricesClient::initMatrix(std::string input) {
+void MatricesClient::initialiseMatrixFromInput(std::string input) {
 	std::regex nameRegex("[a-zA-Z_$][a-zA-Z_$0-9]*");
 	std::regex dimensionRegex("[0-9]+");
 	std::smatch nameMatch;
@@ -78,7 +51,7 @@ void MatricesClient::initMatrix(std::string input) {
 
 	std::vector<std::vector<double>> matrixValues(matrixHeight, std::vector<double>(matrixWidth));
 	for (int i = 0; i < matrixHeight; i++) {
-		std::cout << getCommandPrefix() << "Enter row " + std::to_string(i + 1) + ": ";
+		std::cout << "Enter row " + std::to_string(i + 1) + ": ";
 		for (int j = 0; j < matrixWidth; j++) {
 			std::cin >> matrixValues[i][j];
 		}
@@ -86,44 +59,70 @@ void MatricesClient::initMatrix(std::string input) {
 
 	auto matrix = std::make_shared<linalg::Matrix<double>>(matrixValues);
 
-	std::cout << matrix;
-
 	mVariables[matrixName] = matrix;
 }
 
 void MatricesClient::printMatrix(const std::string &name) {
-	std::shared_ptr<linalg::Matrix<double>> matrixPtr = mVariables[name];
-	if (matrixPtr) {
-		std::cout << *matrixPtr;
-	} else {
-		std::cout << "There is no matrix with name \"" + name + "\".";
+	linalg::Matrix<double> matrix = getMatrixFromInput(name);
+	std::cout << matrix;
+}
+
+void MatricesClient::printDeterminant(const std::string &input) {
+	linalg::Matrix<double> matrix = getMatrixFromInput(input);
+	try {
+		std::cout << matrix.det();
+	} catch (const std::invalid_argument &e) {
+		std::cerr << e.what() << std::endl;
 	}
 }
 
-void MatricesClient::evaluateExpression(const std::string &string) {
+void MatricesClient::printInverse(const std::string &input) {
+	linalg::Matrix<double> matrix = getMatrixFromInput(input);
+	try {
+		std::cout << matrix.invert();
+	} catch (const std::invalid_argument &e) {
+		std::cerr << e.what() << std::endl;
+	}
+}
+
+void MatricesClient::printDiagonalMatrix(const std::string &input) {
+	linalg::Matrix<double> matrix = getMatrixFromInput(input);
+	try {
+		std::cout << matrix.toDiagonalMatrix();
+	} catch (const std::invalid_argument &e) {
+		std::cerr << e.what() << std::endl;
+	}
+}
+
+void MatricesClient::printTransposed(const std::string &input) {
+	linalg::Matrix<double> matrix = getMatrixFromInput(input);
+	std::cout << matrix.transpose();
+}
+
+void MatricesClient::printNormalisedVector(const std::string &string) {
 
 }
 
-void MatricesClient::printDeterminant() {
+void MatricesClient::printEvaluatedExpression(const std::string &string) {
 
 }
 
-void MatricesClient::printInverse() {
+linalg::Matrix<double> MatricesClient::getMatrixFromInput(const std::string &input) {
+	std::smatch nameMatch;
+	std::regex_search(input, nameMatch, Constants::MATRIX_NAME_REGEX);
+	std::string matrixName = nameMatch[0];
 
+	std::shared_ptr<linalg::Matrix<double>> matrix = mVariables[matrixName];
+	if (matrix) {
+		return *matrix;
+	} else {
+		std::cerr << "There is no matrix with name " << matrixName;
+	}
 }
 
-void MatricesClient::printDiagonalMatrix() {
-
-}
-
-void MatricesClient::transposeMatrix() {
-
-}
-
-void MatricesClient::printNormalisedVector() {
-
-}
 
 MatricesClient::MatricesClient() : Client() {
 	mVariables = std::unordered_map<std::string, std::shared_ptr<linalg::Matrix<double>>>();
 }
+
+
