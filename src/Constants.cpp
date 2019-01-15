@@ -1,7 +1,3 @@
-//
-// Created by ivanasen on 14.01.19.
-//
-
 #include "Constants.hpp"
 
 const std::regex Constants::MATRIX_NAME_REGEX("[a-zA-Z_$][a-zA-Z_$0-9]+");

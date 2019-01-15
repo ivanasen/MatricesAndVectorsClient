@@ -1,5 +1,3 @@
-#include "VariableManager.hpp"
-
 #include <iostream>
 #include <regex>
 #include <memory>
