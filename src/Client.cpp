@@ -4,13 +4,13 @@
 
 void Client::start() {
 	std::string input;
+	std::cout << mCmdPrefix;
 	do {
-		std::cout << mCmdPrefix;
 		getline(std::cin, input);
 		if (!input.empty()) {
 			onInput(input);
+			std::cout << mCmdPrefix;
 		}
-		std::cout << '\n';
 	} while (input != mQuitCmd);
 }
 
