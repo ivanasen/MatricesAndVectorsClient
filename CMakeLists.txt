@@ -3,13 +3,10 @@ project(MatricesAndVectorsClient)
 
 set(CMAKE_CXX_STANDARD 17)
 
-include_directories(${PROJECT_SOURCE_DIR}/lib/googletest/googletest/include
-        ${PROJECT_SOURCE_DIR}/lib/googletest/googletest)
-include_directories(${PROJECT_SOURCE_DIR}/lib/MatricesAndVectors/include
-        ${PROJECT_SOURCE_DIR}/lib/MatricesAndVectors)
+include_directories(${PROJECT_SOURCE_DIR}/lib/MatricesAndVectors/include)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-set(PROJECT_SOURCES src/main.cpp src/MatricesClient.cpp src/Client.cpp include/Client.hpp src/Constants.cpp src/VariableManager.cpp)
+set(PROJECT_SOURCES src/main.cpp src/MatricesClient.cpp src/Client.cpp include/Client.hpp src/Constants.cpp src/VariableManager.cpp src/Utility.cpp src/Utility.hpp)
 add_executable(MatricesAndVectorsClient ${PROJECT_SOURCES})
 
 target_link_libraries(MatricesAndVectorsClient gtest gtest_main pthread)
