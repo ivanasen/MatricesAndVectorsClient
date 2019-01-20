@@ -42,23 +42,6 @@ namespace linalg {
 			return m_array;
 		}
 
-		std::string toString() const {
-			std::string result;
-			for (auto &row : m_array) {
-				for (const T &val : row) {
-					result += std::to_string(val) + "\t";
-				}
-				result += '\n';
-			}
-			result += '\n';
-			return result;
-		}
-
-		friend std::ostream &operator<<(std::ostream &stream, const Array2DWrapper &array) {
-			stream << array.toString();
-			return stream;
-		}
-
 		class Proxy {
 		public:
 			explicit Proxy(std::vector<T> &row) : m_row(&row) {}

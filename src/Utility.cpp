@@ -4,6 +4,10 @@
 #include <Vector.hpp>
 #include <Scalar.hpp>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <Utility.hpp>
+
 #include "Utility.hpp"
 
 bool Utility::isOperator(const std::string &s) {
@@ -187,4 +191,35 @@ std::vector<double> Utility::getNumbersFromString(std::string source) {
 		}
 	}
 	return result;
+}
+
+void Utility::logMatrix(linalg::Matrix<double> &matrix) {
+	std::vector<std::vector<std::string>> stringMatrix(matrix.height(), std::vector<std::string>(matrix.width()));
+
+	for (int i = 0; i < matrix.height(); i++) {
+		for (int j = 0; j < matrix.width(); j++) {
+			std::stringstream stream;
+			stream << std::fixed << std::setprecision(2) << matrix[i][j];
+			stringMatrix[i][j] = stream.str();
+		}
+	}
+
+	std::vector<unsigned long> columnSizes(matrix.width());
+
+	for (int col = 0; col < stringMatrix[0].size(); col++) {
+		for (auto &row : stringMatrix) {
+			if (row[col].length() > columnSizes[col]) {
+				columnSizes[col] = row[col].length();
+			}
+		}
+	}
+
+	for (int i = 0; i < stringMatrix.size(); i++) {
+		for (int j = 0; j < stringMatrix[0].size(); j++) {
+			auto size = columnSizes[j] - stringMatrix[i][j].length() + 1;
+			std::string trailingSpaces = std::string(size, ' ');
+			std::cout << stringMatrix[i][j] << trailingSpaces;
+		}
+		std::cout << '\n';
+	}
 }

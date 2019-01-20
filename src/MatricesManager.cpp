@@ -26,7 +26,7 @@ void MatricesManager::initialiseMatrixFromInput(std::string input) {
 		unsigned long width = stoul(dimensionsMatch[0]);
 		linalg::Matrix matrix = initialiseMatrix(name, height, width);
 		mMatrices[name] = std::make_shared<linalg::Matrix<double>>(matrix);
-		std::cout << matrix;
+		Utility::logMatrix(matrix);
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what();
 	}
@@ -40,7 +40,7 @@ void MatricesManager::initialiseVectorFromInput(const std::string &input) {
 		unsigned long size = stoul(dimensionsMatch[0]);
 		linalg::Matrix matrix = initialiseMatrix(name, 1, size).transpose();
 		mMatrices[name] = std::make_shared<linalg::Matrix<double>>(matrix);
-		std::cout << matrix;
+		Utility::logMatrix(matrix);
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what();
 	}
@@ -67,7 +67,7 @@ linalg::Matrix<double> MatricesManager::initialiseMatrix(std::string &name, unsi
 void MatricesManager::printMatrix(const std::string &string) {
 	try {
 		linalg::Matrix<double> variable = evaluateMatrix(string);
-		std::cout << variable;
+		Utility::logMatrix(variable);
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what() << std::endl;
 	}
@@ -85,7 +85,8 @@ void MatricesManager::printDeterminant(const std::string &input) {
 void MatricesManager::printInverse(const std::string &input) {
 	try {
 		linalg::Matrix<double> matrix = evaluateMatrix(input);
-		std::cout << matrix.invert();
+		linalg::Matrix<double> inverse = matrix.invert();
+		Utility::logMatrix(inverse);
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what() << std::endl;
 	}
@@ -94,7 +95,8 @@ void MatricesManager::printInverse(const std::string &input) {
 void MatricesManager::printDiagonalMatrix(const std::string &input) {
 	try {
 		linalg::Matrix<double> matrix = evaluateMatrix(input);
-		std::cout << matrix.toDiagonalMatrix();
+		linalg::Matrix<double> diagonal = matrix.toDiagonalMatrix();
+		Utility::logMatrix(diagonal);
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what() << std::endl;
 	}
@@ -103,7 +105,8 @@ void MatricesManager::printDiagonalMatrix(const std::string &input) {
 void MatricesManager::printTransposed(const std::string &input) {
 	try {
 		linalg::Matrix<double> matrix = evaluateMatrix(input);
-		std::cout << matrix.transpose();
+		linalg::Matrix<double> transposed = matrix.transpose();
+		Utility::logMatrix(transposed);
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what() << std::endl;
 	}
@@ -112,7 +115,8 @@ void MatricesManager::printTransposed(const std::string &input) {
 void MatricesManager::printNormalisedVector(const std::string &input) {
 	try {
 		linalg::Matrix<double> matrix = evaluateMatrix(input);
-		std::cout << linalg::Vector<double>(matrix).normalise();
+		linalg::Vector<double> normalised = linalg::Vector<double>(matrix).normalise();
+		Utility::logMatrix(normalised);
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what() << std::endl;
 	}
@@ -121,7 +125,7 @@ void MatricesManager::printNormalisedVector(const std::string &input) {
 void MatricesManager::printEvaluatedExpression(const std::string &input) {
 	try {
 		linalg::Matrix<double> result = evaluateExpression(input);
-		std::cout << result;
+		Utility::logMatrix(result);
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what() << std::endl;
 	}
@@ -184,7 +188,7 @@ void MatricesManager::printAssignedExpression(const std::string &input) {
 		linalg::Matrix<double> result = evaluateExpression(expression);
 		mMatrices[matrixName] = std::make_shared<linalg::Matrix<double>>(result);
 
-		std::cout << result;
+		Utility::logMatrix(result);
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what() << std::endl;
 	}

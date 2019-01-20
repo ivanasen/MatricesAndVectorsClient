@@ -39,6 +39,6 @@ public:
 	static std::string trimString(std::string &source);
 
 	static std::vector<double> getNumbersFromString(std::string source);
+
+	static void logMatrix(linalg::Matrix<double> &matrix);
 };
-
-
