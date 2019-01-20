@@ -7,7 +7,7 @@
 #include "Constants.hpp"
 
 MatricesClient::MatricesClient() : Client() {
-	mVariableManager = VariableManager();
+	mMatrixManager = MatricesManager();
 }
 
 void MatricesClient::init() {
@@ -17,25 +17,25 @@ void MatricesClient::init() {
 
 void MatricesClient::onInput(const std::string &input) {
 	if (std::regex_match(input, Constants::MATRIX_INIT_REGEX)) {
-		mVariableManager.initialiseMatrixFromInput(input);
+		mMatrixManager.initialiseMatrixFromInput(input);
 	} else if (std::regex_match(input, Constants::VECTOR_INIT_REGEX)) {
-		mVariableManager.initialiseVectorFromInput(input);
+		mMatrixManager.initialiseVectorFromInput(input);
 	} else if (std::regex_match(input, Constants::MATRIX_PRINT_REGEX)) {
-		mVariableManager.printVariable(input);
+		mMatrixManager.printMatrix(input);
 	} else if (std::regex_match(input, Constants::MATRIX_TRANSPOSE_REGEX)) {
-		mVariableManager.printTransposed(input);
+		mMatrixManager.printTransposed(input);
 	} else if (std::regex_match(input, Constants::MATRIX_DETERMINANT_REGEX)) {
-		mVariableManager.printDeterminant(input);
+		mMatrixManager.printDeterminant(input);
 	} else if (std::regex_match(input, Constants::MATRIX_INVERSE_REGEX)) {
-		mVariableManager.printInverse(input);
+		mMatrixManager.printInverse(input);
 	} else if (std::regex_match(input, Constants::MATRIX_DIAGONAL_REGEX)) {
-		mVariableManager.printDiagonalMatrix(input);
+		mMatrixManager.printDiagonalMatrix(input);
 	} else if (std::regex_match(input, Constants::VECTOR_NORMALISE_REGEX)) {
-		mVariableManager.printNormalisedVector(input);
+		mMatrixManager.printNormalisedVector(input);
 	} else if (std::regex_match(input, Constants::ASSIGNMENT_EXPRESSION_REGEX)) {
-		mVariableManager.printAssignedExpression(input);
+		mMatrixManager.printAssignedExpression(input);
 	} else if (std::regex_match(input, Constants::EXPRESSION_REGEX)) {
-		mVariableManager.printEvaluatedExpression(input);
+		mMatrixManager.printEvaluatedExpression(input);
 	} else {
 		std::cout << "Unknown command " + input + "\n";
 	}

@@ -1,8 +1,8 @@
 #include <stdexcept>
 #include <regex>
 #include <Constants.hpp>
-#include <MatrixOrScalar.hpp>
 #include <Vector.hpp>
+#include <Scalar.hpp>
 #include <iostream>
 #include "Utility.hpp"
 
@@ -83,36 +83,22 @@ std::vector<std::string> Utility::splitExpression(const std::string &expression)
 	return splitExpression;
 }
 
-bool Utility::isName(const std::string &name) {
-	return std::regex_match(name, Constants::VARIABLE_NAME_REGEX);
-}
-
-linalg::MatrixOrScalar<double>
-Utility::applyOperator(linalg::MatrixOrScalar<double> &leftOperand,
-                       linalg::MatrixOrScalar<double> &rightOperand,
+linalg::Matrix<double>
+Utility::applyOperator(linalg::Matrix<double> &leftOperand,
+                       linalg::Matrix<double> &rightOperand,
                        const std::string &op) {
 	if (op == "+") {
 		return leftOperand + rightOperand;
 	} else if (op == "-") {
 		return leftOperand + rightOperand;
 	} else if (op == "*") {
-		if (leftOperand.isMatrix && rightOperand.isMatrix &&
-		    leftOperand.matrixValue().width() == 1 &&
-		    rightOperand.matrixValue().width() == 1) {
-			linalg::Vector leftVector = linalg::Vector(leftOperand.matrixValue());
-			linalg::Vector rightVector = linalg::Vector(rightOperand.matrixValue());
-			return linalg::MatrixOrScalar<double>(leftVector.cross(rightVector));
-		}
-
 		return leftOperand * rightOperand;
 	} else if (op == "/") {
 		return leftOperand / rightOperand;
 	} else if (op == ".") {
-		if (!leftOperand.isMatrix || !rightOperand.isMatrix) {
-			throw std::invalid_argument("Operands need to be vectors in order to calculate dot product");
-		} else {
-			return calculateDotProduct(leftOperand.matrixValue(), rightOperand.matrixValue());
-		}
+		linalg::Vector<double> leftVector = linalg::Vector(leftOperand);
+		linalg::Vector<double> rightVector = linalg::Vector(rightOperand);
+		return linalg::Scalar(leftVector.dot(rightVector));
 	} else {
 		throw std::invalid_argument("Invalid operator " + op);
 	}
@@ -145,7 +131,7 @@ std::vector<unsigned long> Utility::matchBrackets(std::vector<std::string> expre
 		if (expression[i] == "(") {
 			bracketsStack.emplace('(', i);
 		} else if (expression[i] == ")") {
-			std::pair<char, int> top = bracketsStack.top();
+			std::pair<char, unsigned long> top = bracketsStack.top();
 			if (top.first == '(') {
 				matches[i] = top.second;
 			} else {
@@ -165,16 +151,6 @@ std::vector<unsigned long> Utility::matchBrackets(std::vector<std::string> expre
 	return matches;
 }
 
-linalg::MatrixOrScalar<double>
-Utility::calculateDotProduct(linalg::Matrix<double> &first, linalg::Matrix<double> &second) {
-	if (first.height() != second.height()) {
-		throw std::invalid_argument("Vectors must be of same height in order to calculate dot product.");
-	} else {
-		linalg::Vector<double> firstVector(first);
-		linalg::Vector<double> secondVector(second);
-		return linalg::MatrixOrScalar(firstVector.dot(secondVector));
-	}
-}
 
 std::string Utility::extractExpression(const std::string &source) {
 	unsigned long i = 0;
@@ -183,4 +159,32 @@ std::string Utility::extractExpression(const std::string &source) {
 	}
 	std::string expression = source.substr(i + 1);
 	return expression;
+}
+
+std::string Utility::trimString(std::string &source) {
+	unsigned long startIndex = 0;
+	while (startIndex < source.length() && isspace(source[startIndex])) {
+		startIndex++;
+	}
+	unsigned long endIndex = source.length() - 1;
+	while (endIndex >= 0 && isspace(source[startIndex])) {
+		endIndex--;
+	}
+	return source.substr(startIndex, endIndex + 1);
+}
+
+std::vector<double> Utility::getNumbersFromString(std::string source) {
+	std::vector<double> result;
+	for (unsigned long i = 0; i < source.length(); i++) {
+		if (isdigit(source[i])) {
+			try {
+				std::string number = extractNumber(source.substr(i));
+				result.push_back(stof(number));
+				i += number.length();
+			} catch (const std::invalid_argument &e) {
+				throw std::invalid_argument("The elements of the matrix must be numbers");
+			}
+		}
+	}
+	return result;
 }

@@ -7,11 +7,11 @@
 
 
 #include "Client.hpp"
-#include "VariableManager.hpp"
+#include "MatricesManager.hpp"
 
 class MatricesClient : public Client {
 private:
-	VariableManager mVariableManager;
+	MatricesManager mMatrixManager;
 
 	void onInput(const std::string &input) override;
 

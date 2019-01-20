@@ -1,16 +1,18 @@
 #include <vector>
 #include <iostream>
 #include "Client.hpp"
+#include "Utility.hpp"
 
 void Client::start() {
 	std::string input;
 	std::cout << mCmdPrefix;
 	do {
 		getline(std::cin, input);
-		if (!input.empty()) {
-			onInput(input);
-			std::cout << mCmdPrefix;
+		std::string trimmed = Utility::trimString(input);
+		if (!trimmed.empty()) {
+			onInput(trimmed);
 		}
+		std::cout << mCmdPrefix;
 	} while (input != mQuitCmd);
 }
 
@@ -23,7 +25,7 @@ std::string Client::getCommandPrefix() {
 }
 
 std::string Client::DEFAULT_CMD_PREFIX() {
-	return ">> ";
+	return "> ";
 }
 
 std::string Client::DEFAULT_QUIT_CMD() {

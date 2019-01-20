@@ -3,28 +3,29 @@
 #include <string>
 #include <unordered_map>
 #include <Matrix.hpp>
-#include <MatrixOrScalar.hpp>
 
-class VariableManager {
+class MatricesManager {
 private:
-	std::unordered_map<std::string, std::shared_ptr<linalg::MatrixOrScalar<double>>>
-			mVariables;
+	std::unordered_map<std::string, std::shared_ptr<linalg::Matrix<double>>>
+			mMatrices;
 
-	linalg::MatrixOrScalar<double> evaluateVariable(const std::basic_string<char> &variable);
+	linalg::Matrix<double> evaluateMatrix(const std::basic_string<char> &matrix);
 
-	linalg::MatrixOrScalar<double>
+	linalg::Matrix<double>
 	evaluateExpression(const std::string &expression);
 
-	linalg::MatrixOrScalar<double>
+	linalg::Matrix<double>
 	evaluateExpression(const std::vector<std::string> &expression, long startIndex, long endIndex,
 	                   std::vector<unsigned long> &bracketMatches);
 
+	linalg::Matrix<double> initialiseMatrix(std::string &name, unsigned long height, unsigned long width);
+
 public:
-	VariableManager();
+	MatricesManager();
 
 	void initialiseMatrixFromInput(std::string input);
 
-	void printVariable(const std::string &string);
+	void printMatrix(const std::string &string);
 
 	void initialiseVectorFromInput(const std::string &basic_string);
 
