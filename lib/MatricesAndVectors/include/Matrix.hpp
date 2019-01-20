@@ -54,6 +54,10 @@ namespace linalg {
 		}
 
 		Matrix add(T &value) {
+			if (this->height() != this->width()) {
+				throw std::invalid_argument("Only square matrices can be added with numbers.");
+			}
+
 			Matrix identity = Matrix::makeIdentity(this->height());
 			Matrix addMatrix = value * identity;
 			return add(addMatrix);
