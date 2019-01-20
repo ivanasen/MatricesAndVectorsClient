@@ -9,7 +9,7 @@ void Client::start() {
 	do {
 		getline(std::cin, input);
 		std::string trimmed = Utility::trimString(input);
-		if (!trimmed.empty()) {
+		if (!trimmed.empty() && trimmed != mQuitCmd) {
 			onInput(trimmed);
 		}
 		std::cout << mCmdPrefix;
