@@ -2,6 +2,7 @@
 #include <regex>
 #include <Constants.hpp>
 #include <MatrixOrScalar.hpp>
+#include <Vector.hpp>
 #include "Utility.hpp"
 
 bool Utility::isOperator(const std::string &s) {
@@ -19,10 +20,8 @@ int Utility::getOperatorPrecedence(const std::string &s) {
 int Utility::getOperatorPrecedence(const char &c) {
 	if (c == '+' || c == '-') {
 		return 1;
-	} else if (c == '*' || c == '/') {
+	} else if (c == '*' || c == '/' || c == '.') {
 		return 2;
-	} else if (c == '^') {
-		return 3;
 	} else {
 		return -1;
 	}
@@ -96,7 +95,21 @@ Utility::applyOperator(linalg::MatrixOrScalar<double> &leftOperand,
 	} else if (op == "-") {
 		return leftOperand + rightOperand;
 	} else if (op == "*") {
+		if (leftOperand.isMatrix && rightOperand.isMatrix &&
+		    leftOperand.matrixValue().width() == 1 &&
+		    rightOperand.matrixValue().width() == 1) {
+			linalg::Vector leftVector = linalg::Vector(leftOperand.matrixValue());
+			linalg::Vector rightVector = linalg::Vector(rightOperand.matrixValue());
+			return linalg::MatrixOrScalar<double>(leftVector.cross(rightVector));
+		}
+
 		return leftOperand * rightOperand;
+	} else if (op == ".") {
+		if (!leftOperand.isMatrix || !rightOperand.isMatrix) {
+			throw std::invalid_argument("Operands need to be vectors in order to calculate dot product");
+		} else {
+			return calculateDotProduct(leftOperand.matrixValue(), rightOperand.matrixValue());
+		}
 	} else {
 		throw std::invalid_argument("Invalid operator " + op);
 	}
@@ -147,4 +160,15 @@ std::vector<unsigned long> Utility::matchBrackets(std::vector<std::string> expre
 	}
 
 	return matches;
+}
+
+linalg::MatrixOrScalar<double>
+Utility::calculateDotProduct(linalg::Matrix<double> &first, linalg::Matrix<double> &second) {
+	if (first.height() != second.height()) {
+		throw std::invalid_argument("Vectors must be of same height in order to calculate dot product.");
+	} else {
+		linalg::Vector<double> firstVector(first);
+		linalg::Vector<double> secondVector(second);
+		return linalg::MatrixOrScalar(firstVector.dot(secondVector));
+	}
 }

@@ -11,5 +11,5 @@ const std::regex Constants::MATRIX_INVERSE_REGEX("^[ ]*[a-zA-Z]+*.inverse[ ]*$")
 const std::regex Constants::MATRIX_DIAGONAL_REGEX("^[ ]*[a-zA-Z]+*.diagonal[ ]*$");
 const std::regex Constants::MATRIX_DIMENSION_REGEX("[0-9]+");
 const std::regex Constants::VECTOR_NORMALISE_REGEX("^[ ]*[a-zA-Z_$][a-zA-Z_$0-9]*.normalise[ ]*$");
-const std::regex Constants::EXPRESSION_REGEX(".*[+\\-*].*");
+const std::regex Constants::EXPRESSION_REGEX(".*[+\\-*.].*");
 

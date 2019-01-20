@@ -45,12 +45,9 @@ namespace linalg {
 			return Vector(normalizedArray);
 		}
 
-		T scalar(Vector &other) {
-			T product = 0;
-			for (int i = 0; i < this->size(); i++) {
-				product += (*this)[i] * other[i];
-			}
-			return product;
+		T dot(Vector &other) {
+			auto result = other.transpose() * *this;
+			return result[0][0];
 		}
 
 		Vector cross(Vector &other) {

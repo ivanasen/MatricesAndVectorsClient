@@ -77,8 +77,8 @@ namespace linalg {
 
 			Matrix product(height, otherWidth);
 
-			for (int i = 0; i < width; i++) {
-				for (int j = 0; j < width; j++) {
+			for (int i = 0; i < height; i++) {
+				for (int j = 0; j < otherWidth; j++) {
 					product[i][j] = 0;
 					for (int k = 0; k < width; k++) {
 						product[i][j] += (*this)[i][k] * other[k][j];

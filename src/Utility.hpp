@@ -36,6 +36,9 @@ public:
 	              const std::string &op);
 
 	static std::vector<unsigned long> matchBrackets(std::vector<std::string> expression);
+
+	static linalg::MatrixOrScalar<double>
+	calculateDotProduct(linalg::Matrix<double> &matrix, linalg::Matrix<double> &value);
 };
 
 

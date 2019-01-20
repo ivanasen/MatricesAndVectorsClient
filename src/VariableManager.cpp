@@ -29,8 +29,8 @@ void VariableManager::initialiseMatrixFromInput(std::string input) {
 	}
 
 	auto
-	matrix = std::make_shared<linalg::Matrix < double>>
-	(matrixValues);
+			matrix = std::make_shared<linalg::Matrix<double>>
+			(matrixValues);
 	mVariables[matrixName] = matrix;
 }
 
@@ -48,8 +48,8 @@ void VariableManager::initialiseVectorFromInput(const std::string &input) {
 	}
 
 	auto
-	vector = std::make_shared<linalg::Vector < double>>
-	(vectorValues);
+			vector = std::make_shared<linalg::Vector<double>>
+			(vectorValues);
 	mVariables[vectorName] = vector;
 }
 
@@ -102,7 +102,7 @@ void VariableManager::printNormalisedVector(const std::string &input) {
 
 void VariableManager::printEvaluatedExpression(const std::string &input) {
 	try {
-		std::vector expression = Utility::splitExpression(input);
+		std::vector<std::string> expression = Utility::splitExpression(input);
 		std::vector<unsigned long> matches = Utility::matchBrackets(expression);
 		linalg::MatrixOrScalar<double> result = evaluateExpression(expression, 0, expression.size() - 1, matches);
 		if (result.isMatrix) {
@@ -127,7 +127,7 @@ linalg::Matrix<double> &VariableManager::getMatrixWithName(const std::string &in
 }
 
 VariableManager::VariableManager() {
-	mVariables = std::unordered_map<std::string, std::shared_ptr<linalg::Matrix < double>> > ();
+	mVariables = std::unordered_map<std::string, std::shared_ptr<linalg::Matrix<double>>>();
 }
 
 linalg::MatrixOrScalar<double>
