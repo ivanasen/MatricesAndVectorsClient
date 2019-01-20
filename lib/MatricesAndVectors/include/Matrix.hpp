@@ -160,7 +160,7 @@ namespace linalg {
 
 		T det() {
 			if (this->height() != this->width()) {
-				return 0;
+				throw std::invalid_argument("Only square matrices have determinants.");
 			}
 
 			if (this->width() == 2) {
