@@ -16,25 +16,25 @@ void MatricesClient::init() {
 }
 
 void MatricesClient::onInput(const std::string &input) {
-	std::smatch matches;
-
-	if (std::regex_search(input, matches, Constants::MATRIX_INIT_REGEX)) {
+	if (std::regex_match(input, Constants::MATRIX_INIT_REGEX)) {
 		mVariableManager.initialiseMatrixFromInput(input);
-	} else if (std::regex_search(input, matches, Constants::VECTOR_INIT_REGEX)) {
+	} else if (std::regex_match(input, Constants::VECTOR_INIT_REGEX)) {
 		mVariableManager.initialiseVectorFromInput(input);
-	} else if (std::regex_search(input, matches, Constants::MATRIX_PRINT_REGEX)) {
-		mVariableManager.printMatrix(input);
-	} else if (std::regex_search(input, matches, Constants::MATRIX_TRANSPOSE_REGEX)) {
+	} else if (std::regex_match(input, Constants::MATRIX_PRINT_REGEX)) {
+		mVariableManager.printVariable(input);
+	} else if (std::regex_match(input, Constants::MATRIX_TRANSPOSE_REGEX)) {
 		mVariableManager.printTransposed(input);
-	} else if (std::regex_search(input, matches, Constants::MATRIX_DETERMINANT_REGEX)) {
+	} else if (std::regex_match(input, Constants::MATRIX_DETERMINANT_REGEX)) {
 		mVariableManager.printDeterminant(input);
-	} else if (std::regex_search(input, matches, Constants::MATRIX_INVERSE_REGEX)) {
+	} else if (std::regex_match(input, Constants::MATRIX_INVERSE_REGEX)) {
 		mVariableManager.printInverse(input);
-	} else if (std::regex_search(input, matches, Constants::MATRIX_DIAGONAL_REGEX)) {
+	} else if (std::regex_match(input, Constants::MATRIX_DIAGONAL_REGEX)) {
 		mVariableManager.printDiagonalMatrix(input);
-	} else if (std::regex_search(input, matches, Constants::VECTOR_NORMALISE_REGEX)) {
+	} else if (std::regex_match(input, Constants::VECTOR_NORMALISE_REGEX)) {
 		mVariableManager.printNormalisedVector(input);
-	} else if (std::regex_search(input, matches, Constants::EXPRESSION_REGEX)) {
+	} else if (std::regex_match(input, Constants::ASSIGNMENT_EXPRESSION_REGEX)) {
+		mVariableManager.printAssignedExpression(input);
+	} else if (std::regex_match(input, Constants::EXPRESSION_REGEX)) {
 		mVariableManager.printEvaluatedExpression(input);
 	} else {
 		std::cout << "Unknown command " + input + "\n";

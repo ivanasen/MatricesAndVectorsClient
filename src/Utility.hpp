@@ -39,6 +39,10 @@ public:
 
 	static linalg::MatrixOrScalar<double>
 	calculateDotProduct(linalg::Matrix<double> &matrix, linalg::Matrix<double> &value);
+
+	static std::string extractExpression(const std::string &source);
+
+	static std::vector<std::vector<double>> readMatrixFromInput(int height, int width);
 };
 
 

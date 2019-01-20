@@ -9,6 +9,10 @@
 #include "Constants.hpp"
 #include "Utility.hpp"
 
+VariableManager::VariableManager() {
+	mVariables = std::unordered_map<std::string, std::shared_ptr<linalg::MatrixOrScalar<double>>>();
+}
+
 void VariableManager::initialiseMatrixFromInput(std::string input) {
 	std::smatch dimensionsMatch;
 	std::string matrixName = Utility::extractName(input);
@@ -27,11 +31,9 @@ void VariableManager::initialiseMatrixFromInput(std::string input) {
 			std::cin >> matrixValues[i][j];
 		}
 	}
-
-	auto
-			matrix = std::make_shared<linalg::Matrix<double>>
-			(matrixValues);
-	mVariables[matrixName] = matrix;
+	linalg::Matrix<double> matrix(matrixValues);
+	auto matrixVariable = std::make_shared<linalg::MatrixOrScalar<double>>(matrix);
+	mVariables[matrixName] = matrixVariable;
 }
 
 void VariableManager::initialiseVectorFromInput(const std::string &input) {
@@ -47,16 +49,15 @@ void VariableManager::initialiseVectorFromInput(const std::string &input) {
 		std::cin >> vectorValues[i];
 	}
 
-	auto
-			vector = std::make_shared<linalg::Vector<double>>
-			(vectorValues);
-	mVariables[vectorName] = vector;
+	linalg::Vector<double> vector(vectorValues);
+	auto vectorVariable = std::make_shared<linalg::MatrixOrScalar<double>>(vector);
+	mVariables[vectorName] = vectorVariable;
 }
 
-void VariableManager::printMatrix(const std::string &name) {
+void VariableManager::printVariable(const std::string &name) {
 	try {
-		linalg::Matrix<double> matrix = getMatrixWithName(name);
-		std::cout << matrix;
+		linalg::MatrixOrScalar<double> variable = evaluateVariable(name);
+		std::cout << variable;
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what() << std::endl;
 	}
@@ -65,8 +66,12 @@ void VariableManager::printMatrix(const std::string &name) {
 
 void VariableManager::printDeterminant(const std::string &input) {
 	try {
-		linalg::Matrix<double> matrix = getMatrixWithName(input);
-		std::cout << matrix.det() << std::endl;
+		linalg::MatrixOrScalar<double> variable = evaluateVariable(input);
+		if (variable.isMatrix) {
+			std::cout << variable.matrixValue().det() << std::endl;
+		} else {
+			throw std::invalid_argument("Variable \"" + input + "\" is not a matrix.");
+		}
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what() << std::endl;
 	}
@@ -74,8 +79,12 @@ void VariableManager::printDeterminant(const std::string &input) {
 
 void VariableManager::printInverse(const std::string &input) {
 	try {
-		linalg::Matrix<double> matrix = getMatrixWithName(input);
-		std::cout << matrix.invert() << std::endl;
+		linalg::MatrixOrScalar<double> variable = evaluateVariable(input);
+		if (variable.isMatrix) {
+			std::cout << variable.matrixValue().invert();
+		} else {
+			throw std::invalid_argument("Variable \"" + input + "\" is not a matrix.");
+		}
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what() << std::endl;
 	}
@@ -83,51 +92,64 @@ void VariableManager::printInverse(const std::string &input) {
 
 void VariableManager::printDiagonalMatrix(const std::string &input) {
 	try {
-		linalg::Matrix<double> matrix = getMatrixWithName(input);
-		std::cout << matrix.toDiagonalMatrix();
+		linalg::MatrixOrScalar<double> variable = evaluateVariable(input);
+		if (variable.isMatrix) {
+			std::cout << variable.matrixValue().toDiagonalMatrix();
+		} else {
+			throw std::invalid_argument("Variable \"" + input + "\" is not a matrix.");
+		}
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what() << std::endl;
 	}
 }
 
 void VariableManager::printTransposed(const std::string &input) {
-	linalg::Matrix<double> matrix = getMatrixWithName(input);
-	std::cout << matrix.transpose();
+	linalg::MatrixOrScalar<double> variable = evaluateVariable(input);
+	if (variable.isMatrix) {
+		std::cout << variable.matrixValue().transpose();
+	} else {
+		throw std::invalid_argument("Variable \"" + input + "\" is not a matrix.");
+	}
 }
 
 void VariableManager::printNormalisedVector(const std::string &input) {
-	linalg::Vector<double> vector = linalg::Vector<double>(getMatrixWithName(input));
-	std::cout << vector.normalise();
+	linalg::MatrixOrScalar<double> variable = evaluateVariable(input);
+	if (variable.isMatrix) {
+		std::cout << linalg::Vector(variable.matrixValue()).normalise();
+	} else {
+		throw std::invalid_argument("Variable \"" + input + "\" is not a matrix.");
+	}
 }
 
 void VariableManager::printEvaluatedExpression(const std::string &input) {
 	try {
-		std::vector<std::string> expression = Utility::splitExpression(input);
-		std::vector<unsigned long> matches = Utility::matchBrackets(expression);
-		linalg::MatrixOrScalar<double> result = evaluateExpression(expression, 0, expression.size() - 1, matches);
-		if (result.isMatrix) {
-			std::cout << result.matrixValue();
-		} else {
-			std::cout << result.scalarValue() << std::endl;
-		}
+		linalg::MatrixOrScalar<double> result = evaluateExpression(input);
+		std::cout << result;
 	} catch (const std::invalid_argument &e) {
 		std::cout << e.what() << std::endl;
 	}
-
 }
 
-linalg::Matrix<double> &VariableManager::getMatrixWithName(const std::string &input) {
-	std::string matrixName = Utility::extractName(input);
-
-	if (mVariables.find(matrixName) != mVariables.end()) {
-		return *(mVariables[matrixName]);
-	} else {
-		throw std::invalid_argument("There is no matrix with name " + matrixName);
+linalg::MatrixOrScalar<double> VariableManager::evaluateVariable(const std::string &input) {
+	std::string name = Utility::extractName(input);
+	if (!name.empty()) {
+		if (mVariables.find(name) != mVariables.end()) {
+			return *(mVariables[name]);
+		} else {
+			throw std::invalid_argument("There is no variable with name " + name);
+		}
+	} else if (isdigit(input[0])) {
+		double scalar = std::stof(input);
+		return linalg::MatrixOrScalar<double>(scalar);
 	}
 }
 
-VariableManager::VariableManager() {
-	mVariables = std::unordered_map<std::string, std::shared_ptr<linalg::Matrix<double>>>();
+linalg::MatrixOrScalar<double> VariableManager::evaluateExpression(const std::string &expressionStr) {
+	long startIndex = 0;
+	std::vector<std::string> expression = Utility::splitExpression(expressionStr);
+	long endIndex = expression.size() - 1;
+	std::vector<unsigned long> matches = Utility::matchBrackets(expression);
+	return evaluateExpression(expression, startIndex, endIndex, matches);
 }
 
 linalg::MatrixOrScalar<double>
@@ -138,13 +160,7 @@ VariableManager::evaluateExpression(const std::vector<std::string> &expression, 
 	}
 
 	if (endIndex - startIndex == 0) {
-		if (Utility::isName(expression[startIndex])) {
-			linalg::Matrix<double> matrix = getMatrixWithName(expression[startIndex]);
-			return linalg::MatrixOrScalar<double>(matrix);
-		} else if (isdigit(expression[startIndex][0])) {
-			double scalar = std::stof(expression[startIndex]);
-			return linalg::MatrixOrScalar<double>(scalar);
-		}
+		return evaluateVariable(expression[startIndex]);
 	}
 
 	long splitIndex = Utility::findExpressionSplitIndex(expression, bracketMatches, startIndex, endIndex);
@@ -156,4 +172,14 @@ VariableManager::evaluateExpression(const std::vector<std::string> &expression, 
 	linalg::MatrixOrScalar<double> result = Utility::applyOperator(leftResult, rightResult, expression[splitIndex]);
 
 	return result;
+}
+
+void VariableManager::printAssignedExpression(const std::string &input) {
+	std::string variableName = Utility::extractName(input);
+	std::string expression = Utility::extractExpression(input);
+
+	linalg::MatrixOrScalar<double> result = evaluateExpression(expression);
+	mVariables[variableName] = std::make_shared<linalg::MatrixOrScalar<double>>(result);
+
+	std::cout << result;
 }

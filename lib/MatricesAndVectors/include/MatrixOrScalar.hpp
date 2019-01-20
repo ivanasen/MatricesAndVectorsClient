@@ -7,22 +7,18 @@ namespace linalg {
 	struct MatrixOrScalar {
 		bool isMatrix;
 
-		MatrixOrScalar() {
-
+		MatrixOrScalar() : isMatrix(false) {
 		}
 
-		explicit MatrixOrScalar(const Matrix<T> &matrix) {
-			isMatrix = true;
+		explicit MatrixOrScalar(const Matrix<T> &matrix) : isMatrix(true) {
 			value.matrix = matrix;
 		}
 
-		explicit MatrixOrScalar(const T &scalar) {
-			isMatrix = false;
+		explicit MatrixOrScalar(const T &scalar) : isMatrix(false) {
 			value.scalar = scalar;
 		}
 
-		MatrixOrScalar(MatrixOrScalar &source) {
-			isMatrix = source.isMatrix;
+		MatrixOrScalar(MatrixOrScalar &source) : isMatrix(source.isMatrix) {
 			if (isMatrix) {
 				value.matrix = source.matrixValue();
 			} else {
@@ -52,13 +48,13 @@ namespace linalg {
 					return MatrixOrScalar(value.matrix + other.matrixValue());
 				} else {
 					auto identity = Matrix<T>::makeIdentity(value.matrix.height());
-					auto scaledIdentity = other.scalarValue() * identity;
+					Matrix<T> scaledIdentity = other.scalarValue() * identity;
 					return MatrixOrScalar(value.matrix + scaledIdentity);
 				}
 			} else {
 				if (other.isMatrix) {
-					auto identity = Matrix<T>::makeIdentity(value.matrix.height());
-					auto scaledIdentity = value.scalar * identity;
+					auto identity = Matrix<T>::makeIdentity(other.matrixValue().height());
+					Matrix<T> scaledIdentity = value.scalar * identity;
 					return MatrixOrScalar(scaledIdentity + other.matrixValue());
 				} else {
 					return MatrixOrScalar(value.scalar + other.scalarValue());
@@ -98,7 +94,15 @@ namespace linalg {
 			}
 		}
 
-		~MatrixOrScalar() {
+		~MatrixOrScalar() = default;
+
+		friend std::ostream &operator<<(std::ostream &stream, MatrixOrScalar &matrixOrScalar) {
+			if (matrixOrScalar.isMatrix) {
+				stream << matrixOrScalar.matrixValue();
+			} else {
+				stream << matrixOrScalar.scalarValue() << std::endl;
+			}
+			return stream;
 		}
 
 	private:
@@ -110,8 +114,7 @@ namespace linalg {
 			}
 
 			~MatrixOrScalarValue() {
-
-			};
+			}
 		} value;
 	};
 }

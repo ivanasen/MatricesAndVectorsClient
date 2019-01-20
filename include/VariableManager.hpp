@@ -7,10 +7,13 @@
 
 class VariableManager {
 private:
-	std::unordered_map<std::string, std::shared_ptr<linalg::Matrix < double>>>
-	mVariables;
+	std::unordered_map<std::string, std::shared_ptr<linalg::MatrixOrScalar<double>>>
+			mVariables;
 
-	linalg::Matrix<double> &getMatrixWithName(const std::string &input);
+	linalg::MatrixOrScalar<double> evaluateVariable(const std::basic_string<char> &variable);
+
+	linalg::MatrixOrScalar<double>
+	evaluateExpression(const std::string &expression);
 
 	linalg::MatrixOrScalar<double>
 	evaluateExpression(const std::vector<std::string> &expression, long startIndex, long endIndex,
@@ -21,7 +24,7 @@ public:
 
 	void initialiseMatrixFromInput(std::string input);
 
-	void printMatrix(const std::string &string);
+	void printVariable(const std::string &string);
 
 	void initialiseVectorFromInput(const std::string &basic_string);
 
@@ -37,7 +40,5 @@ public:
 
 	void printNormalisedVector(const std::string &string);
 
+	void printAssignedExpression(const std::string &input);
 };
-
-
-

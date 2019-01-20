@@ -3,6 +3,7 @@
 #include <Constants.hpp>
 #include <MatrixOrScalar.hpp>
 #include <Vector.hpp>
+#include <iostream>
 #include "Utility.hpp"
 
 bool Utility::isOperator(const std::string &s) {
@@ -48,7 +49,7 @@ std::string Utility::extractNumber(const std::string &source) {
 
 std::string Utility::extractName(const std::string &source) {
 	std::smatch nameMatch;
-	std::regex_search(source, nameMatch, Constants::MATRIX_NAME_REGEX);
+	std::regex_search(source, nameMatch, Constants::VARIABLE_NAME_REGEX);
 	return nameMatch[0];
 }
 
@@ -83,7 +84,7 @@ std::vector<std::string> Utility::splitExpression(const std::string &expression)
 }
 
 bool Utility::isName(const std::string &name) {
-	return std::regex_match(name, Constants::MATRIX_NAME_REGEX);
+	return std::regex_match(name, Constants::VARIABLE_NAME_REGEX);
 }
 
 linalg::MatrixOrScalar<double>
@@ -104,6 +105,8 @@ Utility::applyOperator(linalg::MatrixOrScalar<double> &leftOperand,
 		}
 
 		return leftOperand * rightOperand;
+	} else if (op == "/") {
+		return leftOperand / rightOperand;
 	} else if (op == ".") {
 		if (!leftOperand.isMatrix || !rightOperand.isMatrix) {
 			throw std::invalid_argument("Operands need to be vectors in order to calculate dot product");
@@ -171,4 +174,13 @@ Utility::calculateDotProduct(linalg::Matrix<double> &first, linalg::Matrix<doubl
 		linalg::Vector<double> secondVector(second);
 		return linalg::MatrixOrScalar(firstVector.dot(secondVector));
 	}
+}
+
+std::string Utility::extractExpression(const std::string &source) {
+	unsigned long i = 0;
+	while (source[i] != '=') {
+		i++;
+	}
+	std::string expression = source.substr(i + 1);
+	return expression;
 }
