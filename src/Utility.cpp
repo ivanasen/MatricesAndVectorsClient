@@ -222,4 +222,5 @@ void Utility::logMatrix(linalg::Matrix<double> &matrix) {
 		}
 		std::cout << '\n';
 	}
+	std::cout << '\n';
 }
